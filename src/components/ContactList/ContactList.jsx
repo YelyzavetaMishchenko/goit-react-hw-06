@@ -1,20 +1,21 @@
 import Contact from "../Contact/Contact";
+import styles from "./ContactList.module.css";
+import { useSelector } from "react-redux";
 
-export default function ContactList({ contacts, onDeleteContact }) {
-  console.log("Полученные контакты в ContactList:", contacts);
+export default function ContactList() {
+  const contacts = useSelector((state) => state.contacts.items);
+  const filter = useSelector((state) => state.filters.name);
 
-  if (!contacts || contacts.length === 0) {
-    return <p>No contacts found.</p>;
-  }
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter)
+  );
 
   return (
-    <ul>
-      {contacts.map((contact) => (
-        <Contact
-          key={contact.id}
-          contact={contact}
-          onDeleteContact={onDeleteContact}
-        />
+    <ul className={styles.list}>
+      {filteredContacts.map((contact) => (
+        <li key={contact.id}>
+          <Contact contact={contact} />
+        </li>
       ))}
     </ul>
   );

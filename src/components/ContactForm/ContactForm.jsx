@@ -1,46 +1,41 @@
-import { nanoid } from "nanoid";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { useState } from "react";
+import styles from "./ContactForm.module.css";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
 
-export default function ContactForm({ onAddContact }) {
-  const validationSchema = Yup.object({
-    name: Yup.string()
-      .min(3, "Minimum 3 characters")
-      .max(50, "Maximum 50 characters")
-      .required("This field is required"),
-    number: Yup.string()
-      .min(3, "Minimum 3 characters")
-      .max(50, "Maximum 50 characters")
-      .required("This field is required"),
-  });
+export default function ContactForm() {
+  const dispatch = useDispatch();
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
 
-  const handleSubmit = (values, { resetForm }) => {
-    const newContact = { id: nanoid(), ...values };
-    onAddContact(newContact);
-    resetForm();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !number) return;
+
+    dispatch(addContact(name, number));
+    setName("");
+    setNumber("");
   };
 
   return (
-    <Formik
-      initialValues={{ name: "", number: "" }}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-    >
-      {() => (
-        <Form>
-          <label>
-            Name
-            <Field type="text" name="name" />
-            <ErrorMessage name="name" component="div" />
-          </label>
-          <label>
-            Number
-            <Field type="text" name="number" />
-            <ErrorMessage name="number" component="div" />
-          </label>
-          <button type="submit">Add contact</button>
-        </Form>
-      )}
-    </Formik>
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <input
+        className={styles.input}
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        className={styles.input}
+        type="tel"
+        placeholder="Phone number"
+        value={number}
+        onChange={(e) => setNumber(e.target.value)}
+      />
+      <button className={styles.button} type="submit">
+        Add contact
+      </button>
+    </form>
   );
 }
